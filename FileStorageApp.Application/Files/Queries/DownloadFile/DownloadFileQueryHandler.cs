@@ -8,9 +8,10 @@ namespace FileStorageApp.Application.Files.Queries.DownloadFile
     public class DownloadFileQueryHandler : IRequestHandler<DownloadFileQuery, DownloadFileVm>
     {
         private readonly IFileRepository _fileRepository;
-        private readonly MinioClient _minioClient;
+        private readonly IMinioClient _minioClient;
+        private const string _bucketName = "filestorage"; // бакет
 
-        public DownloadFileQueryHandler(IFileRepository fileRepository, MinioClient minioClient)
+        public DownloadFileQueryHandler(IFileRepository fileRepository, IMinioClient minioClient)
         {
             _fileRepository = fileRepository;
             _minioClient = minioClient;
@@ -19,7 +20,6 @@ namespace FileStorageApp.Application.Files.Queries.DownloadFile
         public async Task<DownloadFileVm> Handle(DownloadFileQuery request, CancellationToken cancellationToken)
         {
             var file = await _fileRepository.GetFileByIdAsync(request.Id);
-            var bucketName = "fileeeee";
             var objectName = file.fileName;
 
             if (file == null || file.expiryDate < DateTime.UtcNow)
@@ -27,7 +27,7 @@ namespace FileStorageApp.Application.Files.Queries.DownloadFile
                 if (file != null)
                 {
                     await _minioClient.RemoveObjectAsync(new RemoveObjectArgs()
-                        .WithBucket(bucketName)
+                        .WithBucket(_bucketName)
                         .WithObject(file.fileName));
                     await _fileRepository.DeleteFileAsync(file.id);
                 }
@@ -39,7 +39,7 @@ namespace FileStorageApp.Application.Files.Queries.DownloadFile
             try
             {
                 await _minioClient.GetObjectAsync(new GetObjectArgs()
-                    .WithBucket(bucketName)
+                    .WithBucket(_bucketName)
                     .WithObject(objectName)
                     .WithCallbackStream(stream =>
                     {

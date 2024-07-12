@@ -15,9 +15,10 @@ namespace FileStorageApp.Application.Files.Queries.DownloadByUrl
     public class DownloadFileByHashQueryHandler : IRequestHandler<DownloadFileByHashQuery, DownloadFileVm>
     {
         private readonly IFileRepository _fileRepository;
-        private readonly MinioClient _minioClient;
+        private readonly IMinioClient _minioClient;
+        private const string _bucketName = "filestorage"; // бакет
 
-        public DownloadFileByHashQueryHandler(IFileRepository fileRepository, MinioClient minioClient)
+        public DownloadFileByHashQueryHandler(IFileRepository fileRepository, IMinioClient minioClient)
         {
             _fileRepository = fileRepository;
             _minioClient = minioClient;
@@ -26,7 +27,6 @@ namespace FileStorageApp.Application.Files.Queries.DownloadByUrl
         public async Task<DownloadFileVm> Handle(DownloadFileByHashQuery request, CancellationToken cancellationToken)
         {
             var objectName = request.downloadUrl.Segments[^1];
-            var bucketName = "fileeeee";
             var file = await _fileRepository.GetFileByNameAsync(objectName);
 
             if (file == null || file.expiryDate < DateTime.UtcNow || file.isSingleUse == true)
@@ -55,7 +55,7 @@ namespace FileStorageApp.Application.Files.Queries.DownloadByUrl
                     if (file.expiryDate < DateTime.UtcNow)
                     {
                         await _minioClient.RemoveObjectAsync(new RemoveObjectArgs()
-                            .WithBucket(bucketName)
+                            .WithBucket(_bucketName)
                             .WithObject(file.fileName));
                         await _fileRepository.DeleteFileAsync(file.id);
                     }
@@ -71,7 +71,7 @@ namespace FileStorageApp.Application.Files.Queries.DownloadByUrl
             try
             {
                 await _minioClient.GetObjectAsync(new GetObjectArgs()
-                    .WithBucket(bucketName)
+                    .WithBucket(_bucketName)
                     .WithObject(objectName)
                     .WithCallbackStream(stream =>
                     {

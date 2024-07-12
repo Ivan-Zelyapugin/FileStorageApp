@@ -10,9 +10,6 @@ namespace FileStorageApp.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            //services.AddMinio("minio", "minio123");
-            //services.AddSingleton<IMinioClient, MinioClient>();
-            
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             return services;
         }

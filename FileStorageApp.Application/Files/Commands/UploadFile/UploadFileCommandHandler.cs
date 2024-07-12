@@ -9,10 +9,12 @@ namespace FileStorageApp.Application.Files.Commands.UploadFile
 {
     public class UploadFileCommandHandler : IRequestHandler<UploadFileCommand, string>
     {
-        private readonly MinioClient _minioClient;
+        private readonly IMinioClient _minioClient;
         private readonly IFileRepository _fileRepository;
+        private const string _bucketName = "filestorage"; // бакет
+        private const int expiryInSeconds = 3600 * 24 * 7; // длительность ссылки(7 дней)
 
-        public UploadFileCommandHandler(MinioClient minioClient, IFileRepository fileRepository)
+        public UploadFileCommandHandler(IMinioClient minioClient, IFileRepository fileRepository)
         {
             _minioClient = minioClient;
             _fileRepository = fileRepository;
@@ -21,7 +23,6 @@ namespace FileStorageApp.Application.Files.Commands.UploadFile
         public async Task<string> Handle(UploadFileCommand request, CancellationToken cancellationToken)
         {
             var fileName = request.file.FileName;
-            var bucketName = "fileeeee";
             var objectName = request.file.FileName;
 
             TimeSpan expiryDuration = request.expiryDate switch
@@ -34,16 +35,16 @@ namespace FileStorageApp.Application.Files.Commands.UploadFile
 
             try
             {
-                bool found = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName));
+                bool found = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_bucketName));
                 if (!found)
                 {
-                    await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
+                    await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(_bucketName));
                 }
 
                 using (var stream = request.file.OpenReadStream())
                 {
                     await _minioClient.PutObjectAsync(new PutObjectArgs()
-                        .WithBucket(bucketName)
+                        .WithBucket(_bucketName)
                         .WithObject(objectName)
                         .WithStreamData(stream)
                         .WithObjectSize(stream.Length)
@@ -56,7 +57,7 @@ namespace FileStorageApp.Application.Files.Commands.UploadFile
                     fileName = request.file.FileName,
                     fileType = request.file.ContentType,
                     fileSize = request.file.Length,
-                    fileUrl = Path.Combine(bucketName,request.file.FileName),
+                    fileUrl = Path.Combine(_bucketName,request.file.FileName),
                     uploadedOn = DateTime.UtcNow,
                     expiryDate = DateTime.UtcNow.Add(expiryDuration),
                     isSingleUse = request.isSingleUse,
@@ -65,9 +66,8 @@ namespace FileStorageApp.Application.Files.Commands.UploadFile
            
                 await _fileRepository.AddFileAsync(file);
 
-                var expiryInSeconds = 3600*24*7; // 7 дней
                 var downloadUrl = await _minioClient.PresignedGetObjectAsync(new PresignedGetObjectArgs()
-                    .WithBucket(bucketName)
+                    .WithBucket(_bucketName)
                     .WithObject(objectName)
                     .WithExpiry(expiryInSeconds));
 

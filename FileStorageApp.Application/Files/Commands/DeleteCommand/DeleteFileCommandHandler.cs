@@ -10,14 +10,13 @@ namespace FileStorageApp.Application.Files.Commands.DeleteCommand
     public class DeleteFileCommandHandler : IRequestHandler<DeleteFileCommand, Unit>
     {
         private readonly IFileRepository _fileRepository;
-        private readonly MinioClient _minioClient;
-        private readonly string _bucketName;
+        private readonly IMinioClient _minioClient;
+        private const string _bucketName = "filestorage"; // бакет
 
-        public DeleteFileCommandHandler(MinioClient minioClient, IFileRepository fileRepository)
+        public DeleteFileCommandHandler(IMinioClient minioClient, IFileRepository fileRepository)
         {
             _minioClient = minioClient;
             _fileRepository = fileRepository;
-            _bucketName = "fileeeee";
         }
 
         public async Task<Unit> Handle(DeleteFileCommand request, CancellationToken cancellationToken)
