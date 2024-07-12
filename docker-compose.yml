@@ -1,35 +1,73 @@
 version: '3.8'
+
+networks:
+  app-network:
+    driver: bridge
+
 services:
   db:
-    image: postgres
+    image: postgres:15
+    container_name: postgres_db
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: filesdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: filestorage
     ports:
       - "5432:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8081:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db
+    networks:
+      - app-network
 
   minio:
     image: minio/minio
-    command: server /data
+    container_name: minio_storage
     environment:
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data --console-address ":9001"
     ports:
       - "9000:9000"
+      - "9001:9001"
     volumes:
-      - minio-data:/data
+      - minio_data:/data
+    networks:
+      - app-network
 
-  app:
-    build: .
-    ports:
-      - "5000:5000"
+  filestorageapp:
+    image: filestorageapp:latest
+    container_name: filestorageapp
     depends_on:
       - db
       - minio
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Database=filestorage;Username=admin;Password=root
+      - Minio__Endpoint=minio:9000
+      - Minio__AccessKey=minio
+      - Minio__SecretKey=minio123
+      - Minio__BucketName=filestorage
+    ports:
+      - "8080:90"
+    networks:
+      - app-network
 
 volumes:
-  db-data:
-  minio-data:
+  db_data:
+  minio_data:
+  pgadmin_data:

@@ -1,0 +1,39 @@
+# .NET
+**/[Bb]in/
+**/[Dd]ebug/
+**/[Oo]bj/
+**/[Rr]elease/
+**/[Cc]ache/
+**/Properties/launchSettings.json
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
+
+# Rider directories
+.idea/
+
+# Visual Studio Code workspace file
+*.code-workspace
+
+# Other files and directories
+.DS_Store
