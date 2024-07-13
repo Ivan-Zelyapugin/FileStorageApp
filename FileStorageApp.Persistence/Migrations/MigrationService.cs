@@ -1,4 +1,5 @@
 ﻿using DbUp;
+using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
 namespace FileStorageApp.WebApi.Migrations
