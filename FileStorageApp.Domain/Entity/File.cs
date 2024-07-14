@@ -9,6 +9,7 @@ namespace FileStorageApp.Domain.Entity
     public class File
     {
         public Guid id { get; set; } 
+        public Guid userId { get; set; }
         public string fileName { get; set; } = string.Empty; 
         public string fileType { get; set; } = string.Empty; 
         public long fileSize { get; set; } 

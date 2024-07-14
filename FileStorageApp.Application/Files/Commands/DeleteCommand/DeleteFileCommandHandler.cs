@@ -22,7 +22,7 @@ namespace FileStorageApp.Application.Files.Commands.DeleteCommand
         public async Task<Unit> Handle(DeleteFileCommand request, CancellationToken cancellationToken)
         {
             var file = await _fileRepository.GetFileByIdAsync(request.Id);
-            if (file == null)
+            if (file == null || file.userId != request.UserId)
             {
                 throw new NotFoundException(nameof(DomainFile), request.Id);
             }

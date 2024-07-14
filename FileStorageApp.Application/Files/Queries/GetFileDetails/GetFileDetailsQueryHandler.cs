@@ -21,7 +21,7 @@ namespace FileStorageApp.Application.Files.Queries.GetFileDetails
         {
             var file = await _fileRepository.GetFileByIdAsync(request.Id);
 
-            if (file == null)
+            if (file == null || file.userId != request.UserId)
             {
                 throw new NotFoundException(nameof(File), request.Id);
             }

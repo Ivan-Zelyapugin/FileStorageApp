@@ -24,7 +24,7 @@ namespace FileStorageApp.Application.Files.Queries.GetFileList
         public async Task<FileListVm> Handle (GetFileListQuery request,
             CancellationToken cancellationToken)
         {
-            var files = await _fileRepository.GetAllFilesAsync();
+            var files = await _fileRepository.GetAllFilesAsync(request.UserId);
 
             var fileDtos = _mapper.Map<List<FileLookupDto>>(files);
 

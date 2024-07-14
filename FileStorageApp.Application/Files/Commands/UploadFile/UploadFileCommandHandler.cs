@@ -1,8 +1,10 @@
 ﻿using FileStorageApp.Application.Interfaces;
+using FileStorageApp.Domain.Entity;
 using MediatR;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
+using System.Security.Claims;
 using System.Text;
 
 namespace FileStorageApp.Application.Files.Commands.UploadFile
@@ -54,6 +56,7 @@ namespace FileStorageApp.Application.Files.Commands.UploadFile
                 var file = new Domain.Entity.File
                 {
                     id = Guid.NewGuid(),
+                    userId = request.userId,
                     fileName = request.file.FileName,
                     fileType = request.file.ContentType,
                     fileSize = request.file.Length,
@@ -79,5 +82,6 @@ namespace FileStorageApp.Application.Files.Commands.UploadFile
             }
         }
 
+        
     }
 }

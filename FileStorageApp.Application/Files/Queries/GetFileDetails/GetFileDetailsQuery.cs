@@ -5,5 +5,6 @@ namespace FileStorageApp.Application.Files.Queries.GetFileDetails
     public class GetFileDetailsQuery : IRequest<FileDetailsVm>
     {
         public Guid Id { get; set; }
+        public Guid UserId { get; set; }
     }
 }

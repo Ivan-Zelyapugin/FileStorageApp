@@ -1,5 +1,6 @@
 ﻿CREATE TABLE IF NOT EXISTS files (
     "id" uuid PRIMARY KEY,
+    "userId" uuid NOT NULL,
     "fileName" VARCHAR(255) NOT NULL,
     "fileType" VARCHAR(255) NOT NULL,
     "fileSize" BIGINT NOT NULL,

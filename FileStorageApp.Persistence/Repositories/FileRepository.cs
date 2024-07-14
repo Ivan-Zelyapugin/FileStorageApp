@@ -15,11 +15,11 @@ namespace FileStorageApp.Persistence.Repositories
             _connectionFactory = connectionFactory;
         }
 
-        public async Task<IEnumerable<DomainFile>> GetAllFilesAsync()
+        public async Task<IEnumerable<DomainFile>> GetAllFilesAsync(Guid userId)
         {
             using (var connection = _connectionFactory.CreateConnection())
             {
-                return await connection.QueryAsync<DomainFile>("SELECT * FROM files");
+                return await connection.QueryAsync<DomainFile>("SELECT * FROM files WHERE \"userId\" = @userId", new { userId = userId });
             }
         }
 
@@ -43,8 +43,8 @@ namespace FileStorageApp.Persistence.Repositories
         {
             using (var connection = _connectionFactory.CreateConnection())
             {
-                var sql = @"INSERT INTO files (""id"", ""fileName"", ""fileType"", ""fileSize"", ""fileUrl"", ""uploadedOn"", ""expiryDate"", ""isSingleUse"", ""isDownloaded"") 
-            VALUES (@id, @Filename, @Filetype, @Filesize, @Fileurl, @Uploadedon, @Expirydate, @Issingleuse, @Isdownloaded)";
+                var sql = @"INSERT INTO files (""id"", ""userId"", ""fileName"", ""fileType"", ""fileSize"", ""fileUrl"", ""uploadedOn"", ""expiryDate"", ""isSingleUse"", ""isDownloaded"") 
+            VALUES (@id, @userId, @Filename, @Filetype, @Filesize, @Fileurl, @Uploadedon, @Expirydate, @Issingleuse, @Isdownloaded)";
 
                 await connection.ExecuteAsync(sql, file);
             }

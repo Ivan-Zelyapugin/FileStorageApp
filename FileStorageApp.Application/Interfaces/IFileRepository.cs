@@ -4,7 +4,7 @@ namespace FileStorageApp.Application.Interfaces
 {
     public interface IFileRepository
     {
-        Task<IEnumerable<DomainFile>> GetAllFilesAsync();
+        Task<IEnumerable<DomainFile>> GetAllFilesAsync(Guid userId);
         Task<DomainFile> GetFileByIdAsync(Guid id);
         Task<DomainFile> GetFileByNameAsync(string name);
         Task AddFileAsync(DomainFile file);

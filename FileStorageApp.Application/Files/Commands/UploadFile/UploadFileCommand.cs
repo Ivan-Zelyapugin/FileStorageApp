@@ -6,6 +6,7 @@ namespace FileStorageApp.Application.Files.Commands.UploadFile
 {
     public class UploadFileCommand : IRequest<string>
     {
+        public Guid userId { get; set; }
         public IFormFile file { get; set; }
         public bool isSingleUse { get; set; }
         public ExpiryDuration expiryDate { get; set; }

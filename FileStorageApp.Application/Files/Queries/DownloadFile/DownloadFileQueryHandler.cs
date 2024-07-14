@@ -30,8 +30,13 @@ namespace FileStorageApp.Application.Files.Queries.DownloadFile
                         .WithBucket(_bucketName)
                         .WithObject(file.fileName));
                     await _fileRepository.DeleteFileAsync(file.id);
-                }
+                }             
                 throw new Exception("File not found or expired");
+            }
+            if (file.userId != request.UserId)
+            {
+                throw new Exception("File not found or expired");
+
             }
 
             var memoryStream = new MemoryStream();

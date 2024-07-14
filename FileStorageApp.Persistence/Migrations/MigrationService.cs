@@ -21,7 +21,7 @@ namespace FileStorageApp.WebApi.Migrations
 
             var upgrader = DeployChanges.To
                 .PostgresqlDatabase(connectionString)
-                .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+                .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly(), script => script.StartsWith("FileStorageApp.Persistence.Migrations.Scripts"))
                 .LogToConsole()
                 .Build();
 
